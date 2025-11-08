@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Scope Grid Editor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <header class="mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3">Project Scope & Requirements Grid</h1>
+                <div class="btn-group gap-2">
+                    <button id="addRowBtn" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Add Row
+                    </button>
+                    <button id="exportBtn" class="btn btn-success">
+                        <i class="bi bi-download"></i> Export JSON
+                    </button>
+                    <button id="importBtn" class="btn btn-info">
+                        <i class="bi bi-upload"></i> Import JSON
+                    </button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;">
+                </div>
+            </div>
+        </header>
+
+        <!-- Search and Filter Section -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search by Page or Milestone...">
+            </div>
+            <div class="col-md-3">
+                <select id="statusFilter" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="demo-done">Demo Done</option>
+                    <option value="deployed">Deployed</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button id="clearDataBtn" class="btn btn-danger btn-sm">
+                    <i class="bi bi-trash"></i> Clear All Data
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Summary -->
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Progress Overview</h5>
+                        <div class="progress mb-2" style="height: 30px;">
+                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 0%">0%</div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Total Rows: <strong id="totalRows">0</strong></span>
+                            <span>Total Cost: <strong id="totalCost">$0</strong></span>
+                            <span>Avg Progress: <strong id="avgProgress">0%</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid Table -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="gridTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="sortable" data-column="no" style="width: 60px;">
+                            No <i class="bi bi-arrow-down-up"></i>
+                        </th>
+                        <th class="sortable" data-column="page" style="width: 150px;">
+                            Page <i class="bi bi-arrow-down-up"></i>
+                        </th>
+                        <th class="sortable" data-column="childPage" style="width: 150px;">
+                            Child-Page <i class="bi bi-arrow-down-up"></i>
+                        </th>
+                        <th class="sortable" data-column="milestone" style="width: 180px;">
+                            Milestone (Feature) <i class="bi bi-arrow-down-up"></i>
+                        </th>
+                        <th style="width: 250px;">Description</th>
+                        <th style="width: 150px;">Remarks</th>
+                        <th class="sortable" data-column="demoDate" style="width: 140px;">
+                            Demo Date <i class="bi bi-arrow-down-up"></i>
+                        </th>
+                        <th class="sortable" data-column="deploymentDate" style="width: 140px;">
+                            Deployment Date <i class="bi bi-arrow-down-up"></i>
+                        </th>
+                        <th class="sortable" data-column="percentCost" style="width: 100px;">
+                            % of Cost <i class="bi bi-arrow-down-up"></i>
+                        </th>
+                        <th class="sortable" data-column="amount" style="width: 120px;">
+                            Amount <i class="bi bi-arrow-down-up"></i>
+                        </th>
+                        <th style="width: 100px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="gridBody">
+                    <!-- Rows will be dynamically generated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Last saved indicator -->
+        <div class="text-muted text-end mt-2">
+            <small>Last saved: <span id="lastSaved">Never</span></small>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+/* Custom Styles for Project Scope Grid */
+
+:root {
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #0dcaf0;
+}
+
+body {
+    background-color: #f8f9fa;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Header Styling */
+header h1 {
+    color: #212529;
+    font-weight: 600;
+}
+
+.btn-group {
+    display: flex;
+}
+
+/* Table Styling */
+.table-responsive {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem;
+}
+
+#gridTable {
+    margin-bottom: 0;
+}
+
+#gridTable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #212529;
+    color: white;
+    font-weight: 600;
+    border-color: #454d55;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+#gridTable thead th.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+#gridTable thead th.sortable:hover {
+    background-color: #343a40;
+}
+
+#gridTable tbody td {
+    vertical-align: middle;
+    padding: 0.75rem;
+}
+
+/* Editable Cell Styling */
+.editable {
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+.editable:hover {
+    background-color: #f8f9fa;
+    outline: 2px solid #0d6efd;
+    outline-offset: -2px;
+}
+
+.editable input,
+.editable textarea {
+    width: 100%;
+    border: 2px solid #0d6efd;
+    padding: 0.375rem;
+}
+
+.editable textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+/* Status-based Row Colors */
+.table-success {
+    background-color: #d1f4e0 !important;
+}
+
+.table-warning {
+    background-color: #fff3cd !important;
+}
+
+/* Progress Bar in Cell */
+.progress {
+    background-color: #e9ecef;
+}
+
+.progress-bar {
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+/* Button Styling */
+.delete-btn {
+    padding: 0.25rem 0.5rem;
+}
+
+.delete-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Search and Filter Section */
+#searchInput {
+    border: 2px solid #dee2e6;
+    transition: border-color 0.2s;
+}
+
+#searchInput:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Progress Card */
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #212529;
+}
+
+/* Summary Progress Bar */
+#progressBar {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Last Saved Indicator */
+#lastSaved {
+    font-weight: 600;
+    color: var(--success-color);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        margin-bottom: 0.5rem;
+    }
+    
+    #gridTable {
+        font-size: 0.85rem;
+    }
+    
+    #gridTable thead th,
+    #gridTable tbody td {
+        padding: 0.5rem;
+    }
+}
+
+/* Smooth Transitions */
+* {
+    transition: background-color 0.2s ease;
+}
+
+/* Custom Scrollbar */
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Animation for new rows */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+tbody tr {
+    animation: slideIn 0.3s ease;
+}
+
+/* Icon styling */
+.bi {
+    font-size: 1rem;
+    vertical-align: middle;
+}
+
+/* Empty state message */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* Input validation */
+input:invalid,
+textarea:invalid {
+    border-color: var(--danger-color);
+}
+
+input:valid,
+textarea:valid {
+    border-color: var(--success-color);
+}
+
+/* Tooltip-like effect for long text */
+.editable[title] {
+    position: relative;
+}
+
+/* Print styles */
+@media print {
+    .btn,
+    .btn-group,
+    header .d-flex > div,
+    #searchInput,
+    #statusFilter,
+    #clearDataBtn,
+    .delete-btn {
+        display: none !important;
+    }
+    
+    .table-responsive {
+        box-shadow: none;
+    }
+    
+    #gridTable {
+        font-size: 0.75rem;
+    }
+}
