@@ -4,52 +4,193 @@ class GridManager {
         this.data = [];
         this.sortColumn = 'no';
         this.sortDirection = 'asc';
+        this.apiUrl = 'https://localhost:7130/api/Client/hierarchy';
+        this.isLoadingFromApi = false;
         this.init();
     }
 
-    init() {
-        this.loadData();
+    async init() {
+        await this.loadData();
         this.renderGrid();
         this.attachEventListeners();
         this.updateSummary();
     }
 
-    // Load data from localStorage
-    loadData() {
+    // Load data from API first, fallback to localStorage
+    async loadData() {
+        // Try loading from localStorage first for offline capability
         const saved = localStorage.getItem('gridData');
         if (saved) {
             this.data = JSON.parse(saved);
-        } else {
-            // Initialize with sample data
-            this.data = [
-                {
-                    id: this.generateId(),
-                    no: 1,
-                    page: 'Home',
-                    childPage: 'Landing',
-                    milestone: 'Initial Setup',
-                    description: 'Create home page layout',
-                    remarks: 'Priority 1',
-                    demoDate: '2025-11-15',
-                    deploymentDate: '2025-11-20',
-                    percentCost: 10,
-                    amount: 1000
-                },
-                {
-                    id: this.generateId(),
-                    no: 2,
-                    page: 'Dashboard',
-                    childPage: 'Analytics',
-                    milestone: 'Data Visualization',
-                    description: 'Build charts and graphs',
-                    remarks: 'Requires API integration',
-                    demoDate: '2025-11-25',
-                    deploymentDate: '2025-12-01',
-                    percentCost: 25,
-                    amount: 2500
-                }
-            ];
+            this.renderGrid();
+            this.updateSummary();
+        }
+
+        // Then try to fetch from API
+        try {
+            this.isLoadingFromApi = true;
+            this.showLoadingIndicator();
+            
+            const response = await fetch(this.apiUrl);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const apiData = await response.json();
+            
+            // Transform API data to grid format
+            this.data = this.transformApiData(apiData);
+            
+            // Save to localStorage for offline use
             this.saveData();
+            
+            // Re-render with fresh data
+            this.renderGrid();
+            this.updateSummary();
+            
+            this.showSuccessMessage('Data loaded from server successfully!');
+            
+        } catch (error) {
+            console.error('Error loading data from API:', error);
+            
+            // If we have cached data, use it
+            if (this.data.length > 0) {
+                this.showWarningMessage('Using cached data. Server unavailable.');
+            } else {
+                // No cached data, initialize with empty array
+                this.data = [];
+                this.showErrorMessage('Failed to load data. You can start adding rows manually.');
+            }
+        } finally {
+            this.isLoadingFromApi = false;
+            this.hideLoadingIndicator();
+        }
+    }
+
+    // Transform API response to grid data format
+    transformApiData(apiResponse) {
+        const gridData = [];
+        
+        // Iterate through clients and their projects
+        apiResponse.forEach(client => {
+            client.projects.forEach(project => {
+                project.milestones.forEach(milestone => {
+                    const gridRow = {
+                        id: this.generateId(),
+                        milestoneId: milestone.milestoneId,
+                        no: milestone.no,
+                        page: milestone.page || '',
+                        childPage: milestone.childPage || '',
+                        milestone: milestone.milestoneFeature || '',
+                        description: milestone.description || '',
+                        remarks: milestone.remarks || '',
+                        demoDate: milestone.demoDate ? this.formatDate(milestone.demoDate) : '',
+                        deploymentDate: milestone.deploymentDate ? this.formatDate(milestone.deploymentDate) : '',
+                        percentCost: milestone.percentOfCost || 0,
+                        amount: this.calculateAmount(milestone.percentOfCost || 0),
+                        // Store additional metadata
+                        clientId: client.clientId,
+                        clientName: client.clientName,
+                        projectId: project.projectId
+                    };
+                    gridData.push(gridRow);
+                });
+            });
+        });
+        
+        return gridData;
+    }
+
+    // Format date from API (handle ISO format)
+    formatDate(dateString) {
+        if (!dateString) return '';
+        try {
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0];
+        } catch (e) {
+            return '';
+        }
+    }
+
+    // Calculate amount based on percent (you can modify the total budget)
+    calculateAmount(percentCost) {
+        const totalBudget = 100000; // Default total budget, can be configured
+        return (percentCost / 100) * totalBudget;
+    }
+
+    // Show loading indicator
+    showLoadingIndicator() {
+        const tbody = document.getElementById('gridBody');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="11" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading data from server...</p>
+                </td>
+            </tr>
+        `;
+    }
+
+    // Hide loading indicator
+    hideLoadingIndicator() {
+        // Will be replaced by actual data rendering
+    }
+
+    // Show success message
+    showSuccessMessage(message) {
+        this.showToast(message, 'success');
+    }
+
+    // Show warning message
+    showWarningMessage(message) {
+        this.showToast(message, 'warning');
+    }
+
+    // Show error message
+    showErrorMessage(message) {
+        this.showToast(message, 'danger');
+    }
+
+    // Show toast notification
+    showToast(message, type = 'info') {
+        const toastContainer = document.getElementById('toastContainer') || this.createToastContainer();
+        
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type} alert-dismissible fade show`;
+        toast.role = 'alert';
+        toast.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            toast.remove();
+        }, 5000);
+    }
+
+    // Create toast container if it doesn't exist
+    createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.style.position = 'fixed';
+        container.style.top = '20px';
+        container.style.right = '20px';
+        container.style.zIndex = '9999';
+        container.style.maxWidth = '400px';
+        document.body.appendChild(container);
+        return container;
+    }
+
+    // Reload data from API
+    async reloadFromApi() {
+        if (confirm('Reload data from server? Any unsaved local changes will be overwritten.')) {
+            await this.loadData();
         }
     }
 
@@ -335,6 +476,14 @@ class GridManager {
         document.getElementById('addRowBtn').addEventListener('click', () => {
             this.addRow();
         });
+
+        // Reload from API button
+        const reloadBtn = document.getElementById('reloadApiBtn');
+        if (reloadBtn) {
+            reloadBtn.addEventListener('click', () => {
+                this.reloadFromApi();
+            });
+        }
 
         // Export button
         document.getElementById('exportBtn').addEventListener('click', () => {

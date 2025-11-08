@@ -40,6 +40,7 @@ A static, fully-functional editable grid application for managing project requir
 ### Prerequisites
 - A modern web browser (Chrome, Firefox, Edge, Safari)
 - No server or build tools required!
+- *Optional*: API server running at `https://localhost:7130` for live data sync
 
 ### Installation
 1. Download all files to a folder:
@@ -50,6 +51,48 @@ A static, fully-functional editable grid application for managing project requir
 2. Open `index.html` in your web browser
 
 That's it! The application runs entirely in your browser.
+
+### API Integration
+The application automatically attempts to load data from:
+```
+https://localhost:7130/api/Client/hierarchy
+```
+
+**Behavior:**
+- ✅ **First load**: Tries to fetch from API
+- ✅ **If API fails**: Falls back to localStorage cached data
+- ✅ **Offline mode**: Automatically uses cached data
+- ✅ **Manual reload**: Click "Reload from API" button to sync
+- ✅ **Auto-save**: All edits saved to localStorage for offline access
+
+**API Response Schema:**
+```json
+[
+  {
+    "clientId": 1,
+    "clientName": "PS Creative",
+    "projects": [
+      {
+        "projectId": 2,
+        "milestones": [
+          {
+            "milestoneId": 0,
+            "no": 1,
+            "page": "WebSite",
+            "childPage": "",
+            "milestoneFeature": "Project Kickoff",
+            "description": null,
+            "remarks": null,
+            "demoDate": "",
+            "deploymentDate": "",
+            "percentOfCost": 0
+          }
+        ]
+      }
+    ]
+  }
+]
+```
 
 ## 📖 Usage Guide
 
@@ -71,6 +114,12 @@ That's it! The application runs entirely in your browser.
 ### Searching & Filtering
 - **Search**: Type in the search box to filter by Page or Milestone
 - **Status Filter**: Select from dropdown to filter by status (Pending/Demo Done/Deployed)
+
+### Data Synchronization
+- **Reload from API**: Click "Reload from API" button to fetch latest data from server
+- **Auto-cache**: API data is automatically cached to localStorage
+- **Offline editing**: Continue editing even when API is unavailable
+- **Manual save**: All edits are saved locally in real-time
 
 ### Data Management
 - **Export**: Click "Export JSON" to download a backup file
