@@ -6,6 +6,8 @@ class GridManager {
         this.sortDirection = 'asc';
         this.apiUrl = 'https://localhost:7130/api/Client/hierarchy';
         this.isLoadingFromApi = false;
+        this.currentPage = 1;
+        this.rowsPerPage = 25;
         this.init();
     }
 
@@ -243,9 +245,84 @@ class GridManager {
             }
         });
 
-        filteredData.forEach(row => {
+        // Apply pagination
+        const totalRows = filteredData.length;
+        const totalPages = this.rowsPerPage === 'all' ? 1 : Math.ceil(totalRows / this.rowsPerPage);
+        
+        // Reset to page 1 if current page exceeds total pages
+        if (this.currentPage > totalPages && totalPages > 0) {
+            this.currentPage = 1;
+        }
+        
+        // Calculate pagination range
+        let paginatedData = filteredData;
+        if (this.rowsPerPage !== 'all') {
+            const startIndex = (this.currentPage - 1) * this.rowsPerPage;
+            const endIndex = startIndex + this.rowsPerPage;
+            paginatedData = filteredData.slice(startIndex, endIndex);
+        }
+
+        // Render rows
+        paginatedData.forEach(row => {
             tbody.appendChild(this.createRow(row));
         });
+
+        // Update pagination controls
+        this.updatePaginationControls(totalPages, totalRows);
+    }
+
+    // Update pagination controls
+    updatePaginationControls(totalPages, totalRows) {
+        document.getElementById('currentPage').textContent = totalPages === 0 ? 0 : this.currentPage;
+        document.getElementById('totalPages').textContent = totalPages;
+
+        // Enable/disable pagination buttons
+        const firstPage = document.getElementById('firstPage');
+        const prevPage = document.getElementById('prevPage');
+        const nextPage = document.getElementById('nextPage');
+        const lastPage = document.getElementById('lastPage');
+
+        // Disable first and previous if on first page
+        if (this.currentPage <= 1) {
+            firstPage.classList.add('disabled');
+            prevPage.classList.add('disabled');
+        } else {
+            firstPage.classList.remove('disabled');
+            prevPage.classList.remove('disabled');
+        }
+
+        // Disable next and last if on last page
+        if (this.currentPage >= totalPages || totalPages === 0) {
+            nextPage.classList.add('disabled');
+            lastPage.classList.add('disabled');
+        } else {
+            nextPage.classList.remove('disabled');
+            lastPage.classList.remove('disabled');
+        }
+    }
+
+    // Go to specific page
+    goToPage(page) {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+        
+        let filteredData = this.data.filter(row => {
+            const matchesSearch = !searchTerm || 
+                row.page.toLowerCase().includes(searchTerm) || 
+                row.milestone.toLowerCase().includes(searchTerm) ||
+                row.childPage.toLowerCase().includes(searchTerm);
+            
+            const matchesStatus = !statusFilter || this.getRowStatus(row) === statusFilter;
+            
+            return matchesSearch && matchesStatus;
+        });
+
+        const totalPages = this.rowsPerPage === 'all' ? 1 : Math.ceil(filteredData.length / this.rowsPerPage);
+        
+        if (page >= 1 && page <= totalPages) {
+            this.currentPage = page;
+            this.renderGrid();
+        }
     }
 
     // Get row status based on dates
@@ -473,6 +550,49 @@ class GridManager {
 
     // Attach event listeners
     attachEventListeners() {
+        // Pagination controls
+        document.getElementById('rowsPerPage').addEventListener('change', (e) => {
+            const value = e.target.value;
+            this.rowsPerPage = value === 'all' ? 'all' : parseInt(value);
+            this.currentPage = 1;
+            this.renderGrid();
+        });
+
+        document.getElementById('firstPage').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.goToPage(1);
+        });
+
+        document.getElementById('prevPage').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.goToPage(this.currentPage - 1);
+        });
+
+        document.getElementById('nextPage').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.goToPage(this.currentPage + 1);
+        });
+
+        document.getElementById('lastPage').addEventListener('click', (e) => {
+            e.preventDefault();
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            let filteredData = this.data.filter(row => {
+                const matchesSearch = !searchTerm || 
+                    row.page.toLowerCase().includes(searchTerm) || 
+                    row.milestone.toLowerCase().includes(searchTerm) ||
+                    row.childPage.toLowerCase().includes(searchTerm);
+                
+                const matchesStatus = !statusFilter || this.getRowStatus(row) === statusFilter;
+                
+                return matchesSearch && matchesStatus;
+            });
+
+            const totalPages = this.rowsPerPage === 'all' ? 1 : Math.ceil(filteredData.length / this.rowsPerPage);
+            this.goToPage(totalPages);
+        });
+
         // Add row button
         document.getElementById('addRowBtn').addEventListener('click', () => {
             this.addRow();
@@ -510,11 +630,13 @@ class GridManager {
 
         // Search input
         document.getElementById('searchInput').addEventListener('input', () => {
+            this.currentPage = 1; // Reset to first page on search
             this.renderGrid();
         });
 
         // Status filter
         document.getElementById('statusFilter').addEventListener('change', () => {
+            this.currentPage = 1; // Reset to first page on filter
             this.renderGrid();
         });
 

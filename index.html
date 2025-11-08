@@ -83,9 +83,53 @@
             </div>
         </div>
 
+        <!-- Pagination Controls -->
+        <div class="row mb-2">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-muted small">Show:</span>
+                        <select id="rowsPerPage" class="form-select form-select-sm" style="width: auto;">
+                            <option value="10">10 rows</option>
+                            <option value="25" selected>25 rows</option>
+                            <option value="50">50 rows</option>
+                            <option value="100">100 rows</option>
+                            <option value="all">All</option>
+                        </select>
+                        <span class="text-muted small">|</span>
+                        <span class="text-muted small">Page <strong id="currentPage">1</strong> of <strong id="totalPages">1</strong></span>
+                    </div>
+                    <nav aria-label="Pagination">
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item" id="firstPage">
+                                <a class="page-link" href="#" aria-label="First">
+                                    <i class="bi bi-chevron-bar-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item" id="prevPage">
+                                <a class="page-link" href="#" aria-label="Previous">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item" id="nextPage">
+                                <a class="page-link" href="#" aria-label="Next">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item" id="lastPage">
+                                <a class="page-link" href="#" aria-label="Last">
+                                    <i class="bi bi-chevron-bar-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
         <!-- Grid Table -->
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover" id="gridTable">
+        <div class="table-responsive" style="max-height: calc(100vh - 380px); overflow-y: auto; padding: 0.5rem;">
+            <table class="table table-bordered table-hover sticky-header mb-0" id="gridTable">
                 <thead class="table-dark">
                     <tr>
                         <th class="sortable" data-column="no" style="width: 60px;">

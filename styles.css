@@ -28,23 +28,41 @@ header h1 {
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    padding: 1rem;
+    padding: 0;
+    position: relative;
+    overflow: auto;
 }
 
 #gridTable {
     margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
-#gridTable thead th {
+/* Sticky Table Header */
+#gridTable.sticky-header thead th {
     position: sticky;
-    top: 0;
-    z-index: 10;
-    background-color: #212529;
+    top: -1px;
+    z-index: 100;
+    background-color: #212529 !important;
     color: white;
     font-weight: 600;
     border-color: #454d55;
     vertical-align: middle;
     white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    padding: 0.75rem;
+}
+
+/* Ensure header stays above tbody */
+#gridTable thead {
+    position: relative;
+    z-index: 10;
+}
+
+#gridTable tbody {
+    position: relative;
+    z-index: 1;
 }
 
 #gridTable thead th.sortable {
@@ -53,12 +71,13 @@ header h1 {
 }
 
 #gridTable thead th.sortable:hover {
-    background-color: #343a40;
+    background-color: #343a40 !important;
 }
 
 #gridTable tbody td {
     vertical-align: middle;
     padding: 0.75rem;
+    background-color: white;
 }
 
 /* Editable Cell Styling */
@@ -66,6 +85,7 @@ header h1 {
     cursor: pointer;
     position: relative;
     transition: background-color 0.2s;
+    background-color: white;
 }
 
 .editable:hover {
@@ -79,6 +99,9 @@ header h1 {
     width: 100%;
     border: 2px solid #0d6efd;
     padding: 0.375rem;
+    z-index: 1000;
+    position: relative;
+    background-color: white;
 }
 
 .editable textarea {
@@ -91,8 +114,29 @@ header h1 {
     background-color: #d1f4e0 !important;
 }
 
+.table-success td {
+    background-color: #d1f4e0 !important;
+}
+
 .table-warning {
     background-color: #fff3cd !important;
+}
+
+.table-warning td {
+    background-color: #fff3cd !important;
+}
+
+/* Default row background */
+tbody tr {
+    background-color: white;
+}
+
+tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+tbody tr:hover td {
+    background-color: inherit;
 }
 
 /* Progress Bar in Cell */
@@ -208,6 +252,38 @@ header h1 {
 /* Smooth Transitions */
 * {
     transition: background-color 0.2s ease;
+}
+
+/* Pagination Styling */
+.pagination {
+    margin: 0;
+}
+
+.pagination .page-link {
+    color: var(--primary-color);
+    border-color: #dee2e6;
+    padding: 0.375rem 0.75rem;
+}
+
+.pagination .page-link:hover {
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+#rowsPerPage {
+    cursor: pointer;
 }
 
 /* Custom Scrollbar */
