@@ -456,11 +456,12 @@ class GridManager {
 
         document.getElementById('totalRows').textContent = totalRows;
         document.getElementById('totalCost').textContent = '$' + this.formatNumber(totalCost);
-        document.getElementById('avgProgress').textContent = avgProgress.toFixed(1) + '%';
         
         const progressBar = document.getElementById('progressBar');
+        const avgProgressEl = document.getElementById('avgProgress');
+        
         progressBar.style.width = avgProgress + '%';
-        progressBar.textContent = avgProgress.toFixed(1) + '%';
+        avgProgressEl.textContent = avgProgress.toFixed(1) + '%';
     }
 
     // Update last saved timestamp
